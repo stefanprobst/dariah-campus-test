@@ -9,7 +9,7 @@ import * as v from "valibot";
 import { matter } from "vfile-matter";
 import * as YAML from "yaml";
 
-import { env } from "@/config/env.config";
+import { env } from "../../config/env.config";
 
 const ArgsInputSchema = v.object({
 	resource: v.pipe(v.string(), v.nonEmpty()),
@@ -66,7 +66,7 @@ async function create() {
 
 	// const doi = createUrl({ baseUrl: resolver, pathname: response["epic-pid"] });
 
-	const doi = randomUUID() + "-" + String(resourceUrl);
+	const doi = `${randomUUID()}-${String(resourceUrl)}`;
 
 	await writeFile(
 		absoluteFilePath,
