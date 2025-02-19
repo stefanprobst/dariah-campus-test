@@ -32,6 +32,7 @@ async function create() {
 	}
 
 	const id = resource.split("/").at(-2)!;
+	log.info(`Received resource "${resource}" and extracted id "${id}".`);
 
 	if (!id) {
 		return null;
