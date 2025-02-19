@@ -20,7 +20,7 @@ async function create() {
 	const isMainBranch = env.VERCEL_GIT_COMMIT_REF === "main";
 
 	if (!isProductionEnvironment || !isMainBranch) {
-		return false;
+		return null;
 	}
 
 	const args = parseArgs({ options: { resource: { type: "string", short: "r" } } });
@@ -28,13 +28,13 @@ async function create() {
 	const { resource } = v.parse(ArgsInputSchema, args.values);
 
 	if (!resource.endsWith("/index.mdx")) {
-		return false;
+		return null;
 	}
 
 	const id = resource.split("/").at(-2)!;
 
 	if (!id) {
-		return false;
+		return null;
 	}
 
 	const absoluteFilePath = join(process.cwd(), resource);
@@ -43,7 +43,7 @@ async function create() {
 	const metadata = vfile.data.matter as { doi?: string };
 
 	if (metadata.doi) {
-		return false;
+		return null;
 	}
 
 	const resourceUrl = createUrl({
@@ -64,28 +64,28 @@ async function create() {
 	// 	responseType: "json",
 	// })) as { "epic-pid": string };
 
-	// const doi = createUrl({ baseUrl: resolver, pathname: response["epic-pid"] });
+	// const handle = createUrl({ baseUrl: resolver, pathname: response["epic-pid"] });
 
-	const doi = `${randomUUID()}-${String(resourceUrl)}`;
+	const handle = `${randomUUID()}-${String(resourceUrl)}`;
 
 	await writeFile(
 		absoluteFilePath,
-		["---\n", YAML.stringify({ ...metadata, doi: String(doi) }), "---\n", String(vfile)],
+		["---\n", YAML.stringify({ ...metadata, doi: String(handle) }), "---\n", String(vfile)],
 		{ encoding: "utf-8" },
 	);
 
-	return true;
+	return handle;
 }
 
 create()
-	.then((isSuccessful) => {
-		if (isSuccessful) {
-			log.success("Successfully created DOIs.");
+	.then((handle) => {
+		if (handle != null) {
+			log.success(`Successfully created handle "${handle}".`);
 		} else {
-			log.info("Skipped creating DOIs.");
+			log.info("Skipped creating handle.");
 		}
 	})
 	.catch((error: unknown) => {
-		log.error("Failed to create DOIs.\n", String(error));
+		log.error("Failed to create handle.\n", String(error));
 		process.exitCode = 1;
 	});
