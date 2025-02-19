@@ -8,8 +8,9 @@ for file in $files; do
 done
 
 if [[ -n "$(git diff --staged)" ]]; then
+  git remote -v
 	git config user.name "${GITHUB_USERNAME}"
 	git config user.email "${GITHUB_EMAIL}"
 	git commit -m "content: add handle [skip ci]"
-	git push --set-upstream origin master:main
+	git push origin master:main
 fi
