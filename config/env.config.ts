@@ -18,7 +18,7 @@ export const env = createEnv({
 			BUNDLE_ANALYZER: v.optional(v.picklist(["disabled", "enabled"]), "disabled"),
 			CI: v.optional(v.pipe(v.unknown(), v.transform(Boolean), v.boolean())),
 			HANDLE_PASSWORD: v.optional(v.pipe(v.string(), v.nonEmpty())),
-			HANDLE_PREFIX: v.optional(v.pipe(v.string(), v.nonEmpty()), "21.11115"),
+			HANDLE_PREFIX: v.optional(v.pipe(v.string(), v.nonEmpty()), "21.11159"),
 			HANDLE_PROVIDER: v.optional(v.pipe(v.string(), v.url()), "http://pid.gwdg.de/handles/"),
 			HANDLE_RESOLVER: v.optional(v.pipe(v.string(), v.url()), "https://hdl.handle.net/"),
 			HANDLE_USERNAME: v.optional(v.pipe(v.string(), v.nonEmpty())),
