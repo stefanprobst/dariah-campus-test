@@ -11,5 +11,5 @@ if [[ -n "$(git diff --staged)" ]]; then
 	git config user.name "${GITHUB_USERNAME}"
 	git config user.email "${GITHUB_EMAIL}"
 	git commit -m "content: add handle [skip ci]"
-	git push origin main
+	git push origin
 fi

@@ -9,7 +9,40 @@ import * as v from "valibot";
 import { matter } from "vfile-matter";
 import * as YAML from "yaml";
 
-import { env } from "../../config/env.config.ts";
+import { env } from "@/config/env.config";
+
+function createResourceUrl(path: string): URL {
+	const message = "Invalid resource path."
+
+	assert(path.endsWith("/index.mdx"), message)
+
+	const segments = path.split("/")
+
+	const id = segments.at(-2)!;
+	assert(id, message);
+
+	const collection = segments.at(-3)
+	assert(collection, message)
+
+	if (collection === "curricula") {
+		return createUrl({
+			baseUrl: env.NEXT_PUBLIC_APP_BASE_URL,
+			pathname: `/curricula/${id}`
+		});
+	}
+
+	const kind = segments.at(-4)
+	assert(kind, message)
+
+	if (kind === "resources") {
+		return createUrl({
+			baseUrl: env.NEXT_PUBLIC_APP_BASE_URL,
+			pathname: `/resources/${collection}/${id}`
+		});
+	}
+
+	assert(false, message)
+}
 
 const ArgsInputSchema = v.object({
 	resource: v.pipe(v.string(), v.nonEmpty()),
@@ -24,21 +57,11 @@ async function create() {
 	}
 
 	const args = parseArgs({ options: { resource: { type: "string", short: "r" } } });
+	const { resource: path } = v.parse(ArgsInputSchema, args.values);
 
-	const { resource } = v.parse(ArgsInputSchema, args.values);
+	const url = createResourceUrl(path)
 
-	if (!resource.endsWith("/index.mdx")) {
-		return null;
-	}
-
-	const id = resource.split("/").at(-2)!;
-	log.info(`Received resource "${resource}" and extracted id "${id}".`);
-
-	if (!id) {
-		return null;
-	}
-
-	const absoluteFilePath = join(process.cwd(), resource);
+	const absoluteFilePath = join(process.cwd(), path);
 	const vfile = await read(absoluteFilePath, { encoding: "utf-8" });
 	matter(vfile, { strip: true });
 	const metadata = vfile.data.matter as { doi?: string };
@@ -47,12 +70,7 @@ async function create() {
 		return null;
 	}
 
-	const resourceUrl = createUrl({
-		baseUrl: env.NEXT_PUBLIC_APP_BASE_URL,
-		pathname: `/resources/${id}`,
-	});
-
-	// const body = JSON.stringify([{ type: "URL", parsed_data: String(resourceUrl) }]);
+	// const body = JSON.stringify([{ type: "URL", parsed_data: String(url) }]);
 
 	// const headers = {
 	// 	authorization: `Bearer ${Buffer.from(`${username}:${password}`).toString("base64")}`,
@@ -67,7 +85,7 @@ async function create() {
 
 	// const handle = createUrl({ baseUrl: resolver, pathname: response["epic-pid"] });
 
-	const handle = `${randomUUID()}-${String(resourceUrl)}`;
+	const handle = `${randomUUID()}-${String(url)}`;
 
 	await writeFile(
 		absoluteFilePath,
