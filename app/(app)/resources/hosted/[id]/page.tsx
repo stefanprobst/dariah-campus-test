@@ -1,5 +1,4 @@
 import type { Metadata, ResolvingMetadata } from "next";
-import { draftMode } from "next/headers";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Fragment, type ReactNode } from "react";
 
@@ -101,11 +100,6 @@ export default async function HostedResourcePage(
 
 	const { id: _id } = await params;
 	const id = decodeURIComponent(_id);
-
-	const { isEnabled: isPreviewModeEnabled } = await draftMode();
-	if (isPreviewModeEnabled) {
-		return <main>DRAFT</main>;
-	}
 
 	const client = await createClient(locale);
 	const resource = await client.resources.hosted.get(id);
