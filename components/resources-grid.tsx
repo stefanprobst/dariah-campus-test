@@ -30,7 +30,8 @@ export function ResourcesGrid(props: ResourcesGridProps): JSX.Element {
 						<div key={index} className="flex-1 space-y-6" role="presentation">
 							{resources.map((resource) => {
 								return (
-									<li key={resource.id}>
+									// eslint-disable-next-line jsx-a11y/no-redundant-roles
+									<li key={resource.id} role="listitem">
 										<ResourcePreviewCard peopleLabel={peopleLabel} {...resource} />
 									</li>
 								);
