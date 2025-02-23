@@ -1,5 +1,4 @@
 import type { Metadata, ResolvingMetadata } from "next";
-import { draftMode } from "next/headers";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Fragment, type ReactNode } from "react";
 
@@ -50,9 +49,6 @@ export async function generateMetadata(
 ): Promise<Metadata> {
 	const { params } = props;
 
-	const { isEnabled: isDraftModeEnabled } = await draftMode();
-	console.log({ isDraftModeEnabled });
-
 	const locale = await getLocale();
 	const meta = await getMetadata();
 
@@ -98,9 +94,6 @@ export default async function HostedResourcePage(
 	props: Readonly<HostedResourcePageProps>,
 ): Promise<ReactNode> {
 	const { params } = props;
-
-	const { isEnabled: isDraftModeEnabled } = await draftMode();
-	console.log({ isDraftModeEnabled });
 
 	const locale = await getLocale();
 	const t = await getTranslations("HostedResourcePage");

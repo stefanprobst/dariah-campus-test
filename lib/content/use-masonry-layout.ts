@@ -1,54 +1,35 @@
-import { Children, type ReactNode, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-export function useMasonryLayout(children: ReactNode, variant: "default" | "search" = "default") {
+export function useMasonryLayout<T>(items: Array<T>): Array<Array<T>> | null {
 	const [columnCount, setColumnCount] = useState<number | null>(null);
 
 	useEffect(() => {
-		const controller = new AbortController();
-
 		function onWindowResize() {
 			requestAnimationFrame(() => {
-				switch (variant) {
-					case "default": {
-						if (window.innerWidth >= 1280) {
-							setColumnCount(3);
-						} else if (window.innerWidth >= 768) {
-							setColumnCount(2);
-						} else {
-							setColumnCount(1);
-						}
-
-						break;
-					}
-
-					case "search": {
-						if (window.innerWidth >= 1140) {
-							setColumnCount(2);
-						} else {
-							setColumnCount(1);
-						}
-
-						break;
-					}
+				if (window.innerWidth >= 1280) {
+					setColumnCount(3);
+				} else if (window.innerWidth >= 768) {
+					setColumnCount(2);
+				} else {
+					setColumnCount(1);
 				}
 			});
 		}
 
-		window.addEventListener("resize", onWindowResize, { passive: true, signal: controller.signal });
+		window.addEventListener("resize", onWindowResize, { passive: true });
 
 		onWindowResize();
 
 		return () => {
-			controller.abort();
+			window.removeEventListener("resize", onWindowResize);
 		};
-	}, [variant]);
+	}, []);
 
-	const columns = useMemo(() => {
+	return useMemo(() => {
 		if (columnCount === null) return null;
 
-		const items = Children.toArray(children);
 		const columns = Array.from({ length: columnCount }, () => {
-			return [] as Array<ReactNode>;
+			return [] as Array<T>;
 		});
 
 		items.forEach((item, index) => {
@@ -57,7 +38,5 @@ export function useMasonryLayout(children: ReactNode, variant: "default" | "sear
 		});
 
 		return columns;
-	}, [children, columnCount]);
-
-	return columns;
+	}, [columnCount, items]);
 }
