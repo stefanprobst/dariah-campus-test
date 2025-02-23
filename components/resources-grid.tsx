@@ -1,65 +1,57 @@
 "use client";
 
-import { Masonry } from "masonic";
-import type { ReactNode } from "react";
-
 import { ResourcePreviewCard } from "@/components/resource-preview-card";
 import type { ContentType } from "@/lib/content/options";
+import { useMasonryLayout } from "@/lib/content/use-masonry-layout";
 
-class ResizeObserverPolyfill {
-	els = [];
-	callback: any;
-	constructor(callback) {
-		this.callback = callback;
-	}
-	observe(el) {
-		// @ts-expect-error
-		this.els.push(el);
-	}
-	unobserve() {
-		// do nothing
-	}
-	disconnect() {}
-
-	resize(index: number, height: number) {
-		// @ts-expect-error
-		this.els[index].offsetHeight = height;
-		this.callback(
-			this.els.map((el) => {
-				return {
-					target: el,
-				};
-			}),
-		);
-	}
-}
-globalThis.ResizeObserver = globalThis.ResizeObserver ?? ResizeObserverPolyfill;
-
-interface ResourcesGridProps {
+export interface ResourcesGridProps {
 	peopleLabel: string;
 	resources: Array<{
-		contentType: ContentType | "curriculum" | "event" | "pathfinder";
-		href: string;
 		id: string;
+		title: string;
+		href: string;
 		locale: string;
 		people: Array<{ id: string; name: string; image: string }>;
+		contentType: ContentType | "curriculum" | "event" | "pathfinder";
 		summary: { content: string; title: string };
-		title: string;
 	}>;
 }
 
-export function ResourcesGrid(props: ResourcesGridProps): ReactNode {
+export function ResourcesGrid(props: ResourcesGridProps): JSX.Element {
 	const { peopleLabel, resources } = props;
 
+	const columns = useMasonryLayout(resources);
+
+	if (columns != null) {
+		return (
+			<ul className="flex space-x-6">
+				{columns.map((resources, index) => {
+					return (
+						<div key={index} className="flex-1 space-y-6" role="presentation">
+							{resources.map((resource) => {
+								return (
+									// eslint-disable-next-line jsx-a11y/no-redundant-roles
+									<li key={resource.id} role="listitem">
+										<ResourcePreviewCard peopleLabel={peopleLabel} {...resource} />
+									</li>
+								);
+							})}
+						</div>
+					);
+				})}
+			</ul>
+		);
+	}
+
 	return (
-		<Masonry
-			columnGutter={24}
-			columnWidth={384}
-			items={resources}
-			overscanBy={5}
-			render={({ data }) => {
-				return <ResourcePreviewCard peopleLabel={peopleLabel} {...data} />;
-			}}
-		/>
+		<ul className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+			{resources.map((resource) => {
+				return (
+					<li key={resource.id}>
+						<ResourcePreviewCard peopleLabel={peopleLabel} {...resource} />
+					</li>
+				);
+			})}
+		</ul>
 	);
 }

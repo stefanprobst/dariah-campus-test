@@ -58,7 +58,6 @@
 		"fast-glob": "^3.3.3",
 		"image-dimensions": "^2.3.0",
 		"lucide-react": "^0.475.0",
-		"masonic": "^4.0.1",
 		"next": "^15.1.7",
 		"next-intl": "4.0.0-beta-ca3fcd5",
 		"react": "^19.0.0",
